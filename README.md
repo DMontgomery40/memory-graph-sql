@@ -14,53 +14,34 @@ This repository contains a SQL implementation of a memory graph data model with 
 - Entity type hierarchy
 - Valid relationship constraints
 
-## Usage
+## Files
+- `schema.sql`: Base tables and data model
+- `semantic_layer.sql`: Semantic relationships and type system
+- `example_queries.sql`: Sample queries demonstrating usage
 
-1. First create the base tables:
-```sql
+## Setup
+
+```bash
+# Create database and base schema
 sqlite3 memory_graph.db < schema.sql
-```
 
-2. Then add the semantic layer:
-```sql
+# Add semantic layer
 sqlite3 memory_graph.db < semantic_layer.sql
 ```
 
-## Example Queries
+## Key Features
 
-### Get all implementations with their interfaces:
-```sql
-WITH RECURSIVE interface_hierarchy AS (
-    SELECT 
-        e1.name as implementation,
-        e2.name as interface,
-        1 as level
-    FROM relations r
-    JOIN entities e1 ON e1.id = r.from_entity_id
-    JOIN entities e2 ON e2.id = r.to_entity_id
-    JOIN relation_types rt ON rt.relation_name = r.relation_type
-    WHERE rt.semantic_category = 'inheritance'
-)
-SELECT * FROM interface_hierarchy;
-```
+1. Base Schema
+   - Entity management
+   - Observation tracking
+   - Relationship mapping
 
-### Validate relationships:
-```sql
-SELECT 
-    e1.name as from_entity,
-    e1.entity_type as from_type,
-    r.relation_type,
-    e2.name as to_entity,
-    e2.entity_type as to_type,
-    CASE 
-        WHEN vtr.id IS NULL THEN 'Invalid'
-        ELSE 'Valid'
-    END as validity
-FROM relations r
-JOIN entities e1 ON e1.id = r.from_entity_id
-JOIN entities e2 ON e2.id = r.to_entity_id
-LEFT JOIN valid_type_relations vtr ON 
-    vtr.from_type = e1.entity_type AND
-    vtr.relation_type = r.relation_type AND
-    vtr.to_type = e2.entity_type;
-```
+2. Semantic Layer
+   - Relationship type classification
+   - Type hierarchy management
+   - Relationship validation
+
+3. Advanced Queries
+   - Inheritance hierarchy traversal
+   - Implementation validation
+   - Type consistency checking
