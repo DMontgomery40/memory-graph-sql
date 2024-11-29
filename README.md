@@ -1,101 +1,104 @@
 # Memory Graph SQL with Enhanced Semantic Layer
 
-A sophisticated implementation of MCP (Model Context Protocol) that introduces a powerful semantic layer for enhanced graph relationships and validations. While MCP provides the foundation for entity-relation management, our semantic layer adds rich type hierarchies, intelligent relation validation, and semantic inference capabilities.
+A Model Context Protocol (MCP) compliant implementation that extends the standard memory server with a powerful semantic layer for enhanced graph relationships and validations.
 
-## Key Features
+## MCP Compliance
 
-### Advanced Semantic Layer
+This implementation strictly follows the MCP specification while adding semantic capabilities:
 
-What sets this implementation apart is its sophisticated semantic layer that provides:
+### Core MCP Operations
 
-- **Rich Type Hierarchies**
-  - Multi-level type inheritance with IS_A, CAN_BE, and IMPLEMENTS relationships
-  - Attribute-based type validation
-  - Configurable inheritance rules
+All standard MCP operations are implemented and guaranteed to work:
+- `create_entities`
+- `create_relations`
+- `add_observations`
+- `delete_entities`
+- `delete_observations`
+- `delete_relations`
+- `read_graph`
+- `search_nodes`
+- `open_nodes`
 
-- **Intelligent Relation Validation**
-  - Context-aware relationship validation
-  - Cardinality enforcement
-  - Custom constraint evaluation
-  - Real-time semantic validation
+### Semantic Extensions
 
-- **Semantic Inference Engine**
-  - Pattern-based relationship inference
-  - Confidence scoring for inferred relations
-  - Transitive relation calculation
-  - Context-aware inference rules
+The semantic layer is implemented as non-blocking extensions that enhance but never interfere with core MCP functionality:
 
-### Standard MCP Features
+1. Type System:
+   - Rich type hierarchies (IS_A, CAN_BE, IMPLEMENTS)
+   - Optional attribute validation
+   - Semantic inference capabilities
 
-- Entity Management
-- Observation Tracking
-- Relation Management
-- Basic CRUD Operations
+2. Validation Layer:
+   - Non-blocking semantic validation
+   - Advisory rules and suggestions
+   - Compatibility with core MCP operations
+
+3. Enhanced Relations:
+   - Semantic relationship validation
+   - Extended relation attributes
+   - Inference engine for relationship discovery
 
 ## Architecture
 
 ```
-mcp_server/
-├── semantic/
-│   ├── type_system.py      # Type hierarchy and validation
-│   ├── relations.py        # Semantic relation management
-│   ├── inference.py        # Inference engine
-│   └── validation.py       # Validation system
-├── core/
-│   ├── models.py           # Database models
-│   ├── database.py         # Database connection
-│   └── schemas.py          # Pydantic schemas
-└── api/
-    ├── routes/             # API endpoints
-    └── dependencies.py      # API dependencies
+semantic_graph_server/
+├── mcp/                  # Core MCP implementation
+│   ├── operations.py     # Standard MCP operations
+│   └── validation.py     # MCP validation
+├── semantic/            # Semantic extensions
+│   ├── type_system.py   # Type hierarchies
+│   ├── operations.py    # Enhanced operations
+│   └── inference.py     # Semantic inference
+└── core/               # Shared components
+    ├── config.py       # Server configuration
+    └── database.py     # Database management
 ```
 
-## Semantic Layer Examples
+## Usage
 
-### Type Hierarchy Definition
+### Core MCP Operations
+
 ```python
-# Define sophisticated type hierarchies
-type_system.add_hierarchy({
-    'parent': 'Plugin',
-    'child': 'VideoPlugin',
-    'inheritance': 'IS_A',
-    'attributes': {
-        'stream_capability': {'type': 'boolean', 'required': True},
-        'protocols': {'type': 'array', 'items': 'string'}
+# Standard MCP entity creation
+response = await client.post("/entities", json={
+    "entities": [{
+        "name": "example_entity",
+        "type": "Document",
+        "observations": ["Content here"]
+    }]
+})
+```
+
+### Semantic Features
+
+```python
+# Optional semantic validation
+response = await client.post("/semantic/validate", json={
+    "entity": {
+        "name": "example_entity",
+        "type": "Document",
+        "attributes": {
+            "format": "markdown"
+        }
     }
 })
+
+# Get type hierarchies
+response = await client.get("/semantic/types")
 ```
 
-### Semantic Relation Validation
-```python
-# Define semantically validated relations
-semantic.add_relation_rule({
-    'from_type': 'VideoPlugin',
-    'relation': 'IMPLEMENTS',
-    'to_type': 'StreamInterface',
-    'cardinality': 'ONE_TO_MANY',
-    'constraints': {
-        'required_attributes': ['stream_protocol'],
-        'validation_mode': 'strict'
-    }
-})
+## Configuration
+
+The server can be configured through environment variables or a .env file:
+
+```env
+DATABASE_URL=sqlite+aiosqlite:///./semantic_graph.db
+MCP_SERVER_PORT=8000
+SEMANTIC_VALIDATION_ENABLED=true
+TYPE_SYSTEM_CONFIG=config/types.json
 ```
 
-### Inference Rule Definition
-```python
-# Create sophisticated inference rules
-inference.add_rule({
-    'name': 'stream_capability',
-    'pattern': {
-        'type': 'VideoPlugin',
-        'attributes': {'has_streaming': True}
-    },
-    'inference': 'CAN_STREAM',
-    'confidence_threshold': 0.95
-})
-```
-
-## Setup
+## Installation
 
 1. Clone the repository:
 ```bash
@@ -108,29 +111,37 @@ cd memory-graph-sql
 pip install -r requirements.txt
 ```
 
-3. Initialize the database:
-```python
-from database import init_db
-init_db()
+3. Configure the environment:
+```bash
+cp .env.example .env
+# Edit .env with your settings
 ```
 
-4. Run the server:
+4. Run migrations:
+```bash
+alembic upgrade head
+```
+
+5. Start the server:
 ```bash
 uvicorn main:app --reload
 ```
 
-## Documentation
+## Testing
 
-Comprehensive documentation is available at [https://dmontgomery40.github.io/memory-graph-sql/](https://dmontgomery40.github.io/memory-graph-sql/)
+Run the test suite to verify both MCP compliance and semantic features:
 
-Key documentation sections:
-- [Semantic Layer Architecture](docs/semantic-layer.md)
-- [API Reference](docs/api-reference.md)
-- [Best Practices](docs/best-practices.md)
+```bash
+pytest tests/
+```
 
 ## Contributing
 
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+Contributions are welcome! Please ensure:
+1. Core MCP operations remain unaffected by changes
+2. Semantic features are implemented as non-blocking extensions
+3. All tests pass
+4. Documentation is updated
 
 ## License
 
