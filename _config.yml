@@ -5,17 +5,8 @@ theme: just-the-docs
 url: https://dmontgomery40.github.io/memory-graph-sql
 
 aux_links:
-  Template Repository: https://github.com/DMontgomery40/memory-graph-sql
+  Repository: https://github.com/DMontgomery40/memory-graph-sql
 
-# Color scheme supports "light" (default) and "dark"
 color_scheme: light
-
-# Set a path/url to a logo that will be displayed instead of the title
-# logo: "/assets/images/logo.png"
-
-# Enable or disable the site search
-# Supports true (default) or false
 search_enabled: true
-
-# Heading anchor links appear on hover over h1-h6 tags 
 heading_anchors: true
