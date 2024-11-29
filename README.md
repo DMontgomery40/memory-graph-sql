@@ -1,302 +1,137 @@
+# Memory Graph SQL with Enhanced Semantic Layer
 
-# MCP Server with Enhanced Semantic Layer
+A sophisticated implementation of MCP (Model Context Protocol) that introduces a powerful semantic layer for enhanced graph relationships and validations. While MCP provides the foundation for entity-relation management, our semantic layer adds rich type hierarchies, intelligent relation validation, and semantic inference capabilities.
 
-This repository contains a robust **Model Context Protocol (MCP)** server implementation that incorporates an enhanced **Semantic Layer for Memory Graph**. The server is built using **FastAPI** and **SQLAlchemy**, providing RESTful API endpoints for managing entities, observations, relations, and insights with semantic validations.
+## Key Features
 
-## Project Structure
+### Advanced Semantic Layer
 
-mcp_server/ ├── README.md ├── requirements.txt ├── main.py ├── models.py ├── database.py ├── semantic_layer.sql └── example_requests.py
+What sets this implementation apart is its sophisticated semantic layer that provides:
 
+- **Rich Type Hierarchies**
+  - Multi-level type inheritance with IS_A, CAN_BE, and IMPLEMENTS relationships
+  - Attribute-based type validation
+  - Configurable inheritance rules
 
+- **Intelligent Relation Validation**
+  - Context-aware relationship validation
+  - Cardinality enforcement
+  - Custom constraint evaluation
+  - Real-time semantic validation
 
-### Files
+- **Semantic Inference Engine**
+  - Pattern-based relationship inference
+  - Confidence scoring for inferred relations
+  - Transitive relation calculation
+  - Context-aware inference rules
 
-- **schema.sql**: Base tables and data model for entities, observations, and relations.
-- **semantic_layer.sql**: Enhanced semantic relationships, type hierarchy, and constraints.
-- **database.py**: Database connection and initialization.
-- **models.py**: SQLAlchemy ORM models for the database tables.
-- **main.py**: FastAPI server with API endpoints.
-- **requirements.txt**: Python dependencies.
-- **example_requests.py**: Example Python scripts to interact with the MCP server.
-- **README.md**: Project documentation.
+### Standard MCP Features
+
+- Entity Management
+- Observation Tracking
+- Relation Management
+- Basic CRUD Operations
+
+## Architecture
+
+```
+mcp_server/
+├── semantic/
+│   ├── type_system.py      # Type hierarchy and validation
+│   ├── relations.py        # Semantic relation management
+│   ├── inference.py        # Inference engine
+│   └── validation.py       # Validation system
+├── core/
+│   ├── models.py           # Database models
+│   ├── database.py         # Database connection
+│   └── schemas.py          # Pydantic schemas
+└── api/
+    ├── routes/             # API endpoints
+    └── dependencies.py      # API dependencies
+```
+
+## Semantic Layer Examples
+
+### Type Hierarchy Definition
+```python
+# Define sophisticated type hierarchies
+type_system.add_hierarchy({
+    'parent': 'Plugin',
+    'child': 'VideoPlugin',
+    'inheritance': 'IS_A',
+    'attributes': {
+        'stream_capability': {'type': 'boolean', 'required': True},
+        'protocols': {'type': 'array', 'items': 'string'}
+    }
+})
+```
+
+### Semantic Relation Validation
+```python
+# Define semantically validated relations
+semantic.add_relation_rule({
+    'from_type': 'VideoPlugin',
+    'relation': 'IMPLEMENTS',
+    'to_type': 'StreamInterface',
+    'cardinality': 'ONE_TO_MANY',
+    'constraints': {
+        'required_attributes': ['stream_protocol'],
+        'validation_mode': 'strict'
+    }
+})
+```
+
+### Inference Rule Definition
+```python
+# Create sophisticated inference rules
+inference.add_rule({
+    'name': 'stream_capability',
+    'pattern': {
+        'type': 'VideoPlugin',
+        'attributes': {'has_streaming': True}
+    },
+    'inference': 'CAN_STREAM',
+    'confidence_threshold': 0.95
+})
+```
 
 ## Setup
 
-### 1. Clone the Repository
-
+1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/mcp_server.git
-cd mcp_server
-2. Create a Virtual Environment
-It's recommended to use a virtual environment to manage dependencies.
+git clone https://github.com/DMontgomery40/memory-graph-sql.git
+cd memory-graph-sql
+```
 
-
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-3. Install Dependencies
-bash
-Copy code
+2. Install dependencies:
+```bash
 pip install -r requirements.txt
-4. Initialize the Database
-Ensure that semantic_layer.sql and schema.sql are in the project root directory.
+```
 
+3. Initialize the database:
+```python
+from database import init_db
+init_db()
+```
 
-python
->>> from database import init_db
->>> init_db()
->>> exit()
-This will create a memory_graph.db SQLite database with the necessary tables and initial data.
-
-5. Run the MCP Server
-bash
-Copy code
+4. Run the server:
+```bash
 uvicorn main:app --reload
-The server will start at http://127.0.0.1:8000.
+```
 
-API Endpoints
-1. Create an Entity
-Endpoint: POST /entities/
+## Documentation
 
-Request Body:
+Comprehensive documentation is available at [https://dmontgomery40.github.io/memory-graph-sql/](https://dmontgomery40.github.io/memory-graph-sql/)
 
-json
-Copy code
-{
-  "name": "Hikvision",
-  "entity_type": "Plugin"
-}
-Response:
+Key documentation sections:
+- [Semantic Layer Architecture](docs/semantic-layer.md)
+- [API Reference](docs/api-reference.md)
+- [Best Practices](docs/best-practices.md)
 
+## Contributing
 
-{
-  "id": 1,
-  "name": "Hikvision",
-  "entity_type": "Plugin"
-}
-2. Read Entities
-Endpoint: GET /entities/
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
-Response:
+## License
 
-
-[
-  {
-    "id": 1,
-    "name": "Hikvision",
-    "entity_type": "Plugin"
-  },
-  ...
-]
-3. Create an Observation
-Endpoint: POST /observations/
-
-Request Body:
-
-
-{
-  "entity_id": 1,
-  "relation_id": 2,
-  "observation": "Supports cameras and NVRs"
-}
-Response:
-
-
-{
-  "id": 1,
-  "entity_id": 1,
-  "relation_id": 2,
-  "observation": "Supports cameras and NVRs"
-}
-4. Create a Relation
-Endpoint: POST /relations/
-
-Request Body:
-
-
-{
-  "from_entity_id": 1,
-  "to_entity_id": 2,
-  "relation_type": "implements"
-}
-Response:
-
-
-{
-  "id": 1,
-  "from_entity_id": 1,
-  "to_entity_id": 2,
-  "relation_type": "implements"
-}
-5. Append an Insight
-Endpoint: POST /insights/
-
-Request Body:
-
-
-{
-  "insight": "Hikvision implements multiple video camera interfaces, enhancing interoperability."
-}
-Response:
-
-
-{
-  "message": "Insight added successfully."
-}
-6. Get Full Implementation Hierarchy
-Endpoint: GET /hierarchy/
-
-Response:
-
-
-[
-  {
-    "implementation_id": 1,
-    "implementation": "Hikvision",
-    "interface_id": 2,
-    "interface": "VideoCamera",
-    "level": 1,
-    "path": "Hikvision -> VideoCamera"
-  },
-  ...
-]
-7. Validate Relationships
-Endpoint: GET /validate_relations/
-
-Response:
-
-[
-  {
-    "from_entity": "Hikvision",
-    "from_type": "Plugin",
-    "relation_type": "implements",
-    "to_entity": "VideoCamera",
-    "to_type": "Interface",
-    "validity": "Valid",
-    "valid_relation_id": 1
-  },
-  ...
-]
-8. Find All Implementations of a Specific Interface
-Endpoint: GET /find_implementations/{interface_name}
-
-Example: /find_implementations/VideoCamera
-
-Response:
-
-
-[
-  {
-    "implementation": "Hikvision",
-    "impl_type": "Plugin",
-    "relation_type": "implements",
-    "interface": "VideoCamera",
-    "attribute_key": "supports",
-    "attribute_value": "High-definition streaming"
-  },
-  ...
-]
-Example Requests
-You can use the provided example_requests.py script to interact with the MCP server.
-
-example_requests.py
-
-# example_requests.py
-import requests
-
-BASE_URL = "http://127.0.0.1:8000"
-
-def create_entity(name, entity_type):
-    url = f"{BASE_URL}/entities/"
-    payload = {"name": name, "entity_type": entity_type}
-    response = requests.post(url, json=payload)
-    print("Create Entity:", response.json())
-
-def create_relation(from_id, to_id, relation_type):
-    url = f"{BASE_URL}/relations/"
-    payload = {"from_entity_id": from_id, "to_entity_id": to_id, "relation_type": relation_type}
-    response = requests.post(url, json=payload)
-    print("Create Relation:", response.json())
-
-def append_insight(insight):
-    url = f"{BASE_URL}/insights/"
-    payload = {"insight": insight}
-    response = requests.post(url, json=payload)
-    print("Append Insight:", response.json())
-
-def query_entities(entity_type):
-    url = f"{BASE_URL}/entities/"
-    response = requests.get(url, params={"entity_type": entity_type})
-    print("Query Entities:", response.json())
-
-if __name__ == "__main__":
-    # Example usage
-    create_entity("Hikvision", "Plugin")
-    create_entity("VideoCamera", "Interface")
-    create_relation(1, 2, "implements")
-    append_insight("Hikvision implements multiple video camera interfaces, enhancing interoperability.")
-Run the script:
-
-
-python example_requests.py
-Best Practices and Recommendations
-1. Version Control and Migrations
-Migration Tools: Utilize migration tools like Alembic for managing database schema changes over time. This ensures consistency across different environments and facilitates collaborative development.
-2. Automated Testing
-Testing Frameworks: Implement automated tests using frameworks like pytest to test your API endpoints, database interactions, and business logic. This helps catch issues early during development.
-3. Documentation
-API Documentation: FastAPI automatically generates interactive API documentation at /docs using Swagger UI and at /redoc using ReDoc. Utilize these tools to provide comprehensive API documentation.
-
-Entity-Relationship Diagrams: Maintain ER diagrams to visualize the database schema, aiding in understanding and onboarding new developers.
-
-4. Backup and Recovery
-Regular Backups: Implement regular backups of your memory_graph.db SQLite database to prevent data loss.
-
-Recovery Strategy: Establish a clear recovery strategy to restore the database from backups in case of failures.
-
-5. Security
-Authentication and Authorization: Implement authentication (e.g., OAuth2, JWT) and authorization to secure your API endpoints and protect sensitive data.
-
-Input Validation: Ensure all inputs are validated to prevent SQL injection and other security vulnerabilities.
-
-6. Performance Optimization
-Indexing: Ensure that your database indexes are optimized for the most frequently queried columns to enhance query performance.
-
-Caching: Implement caching strategies (e.g., using Redis) for frequently accessed data to reduce database load and improve response times.
-
-7. Scalability
-Database Choice: While SQLite is suitable for development and small-scale deployments, consider migrating to more robust databases like PostgreSQL for production environments to handle higher loads and concurrent access.
-
-Asynchronous Operations: Utilize FastAPI's asynchronous capabilities to handle multiple requests efficiently.
-
-Conclusion
-By following this comprehensive setup, you now have a fully functional MCP Server with an enhanced Semantic Layer for Memory Graph. This server allows for sophisticated management and querying of entities, relationships, and insights with robust semantic validations. Adhering to best practices ensures that your server remains maintainable, secure, and scalable as your project grows.
-
-Feel free to extend the server's functionality based on your specific requirements and integrate additional features as needed. If you encounter any issues or have further questions, don't hesitate to reach out!
-
-Summary of Enhancements
-1. Complete MCP Server Implementation
-FastAPI Framework: Utilized FastAPI for building high-performance APIs with automatic documentation.
-SQLAlchemy ORM: Leveraged SQLAlchemy for interacting with the SQLite database using Pythonic ORM models.
-Semantic Layer Integration: Incorporated an enhanced semantic layer with relation types, entity type hierarchy, valid type relations, entity attributes, and audit trails.
-2. Robust API Endpoints
-Entity Management: Endpoints to create and read entities.
-Observation Management: Endpoints to create and read observations.
-Relation Management: Endpoints to create and read relations with semantic validations.
-Insight Generation: Endpoint to append business insights.
-Hierarchy Traversal: Endpoint to retrieve the full implementation hierarchy.
-Relationship Validation: Endpoint to validate existing relationships.
-Implementation Finder: Endpoint to find all implementations of a specific interface.
-3. Best Practices Implementation
-Database Initialization: Automated database setup using SQL scripts during server initialization.
-Dependency Management: Clearly defined dependencies in requirements.txt.
-Modular Code Structure: Separated concerns by dividing the project into distinct modules (models.py, database.py, main.py).
-Documentation: Comprehensive README.md with setup instructions, API usage examples, and best practices.
-Example Scripts: Provided example_requests.py for interacting with the server, demonstrating typical use cases.
-4. Security and Data Integrity
-Foreign Key Constraints: Ensured referential integrity across all tables.
-Audit Trails: Implemented triggers to automatically log changes to entities and relations, enhancing traceability.
-Semantic Validations: Enforced valid relationships based on the semantic layer, preventing invalid data associations.
-5. Performance Optimization
-Indexing: Created indexes on frequently queried columns to improve query performance.
-Optimized Schema Design: Structured tables to minimize redundancy and facilitate efficient data retrieval.
-
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
