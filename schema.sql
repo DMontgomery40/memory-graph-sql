@@ -1,59 +1,52 @@
--- SQL Schema and data for Memory Graph
--- Generated 2024-11-27
+-- schema.sql
+-- Base Schema for Memory Graph
+-- Generated on 2024-11-29
 
--- Create tables
+-- Enable Foreign Key Constraints
+PRAGMA foreign_keys = ON;
+
+-- ===========================
+-- Entities Table
+-- ===========================
 CREATE TABLE IF NOT EXISTS entities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
-    entity_type TEXT NOT NULL
+    entity_type TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ===========================
+-- Observations Table
+-- ===========================
 CREATE TABLE IF NOT EXISTS observations (
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     entity_id INTEGER NOT NULL,
+    relation_id INTEGER, -- Optional: Link to a specific relation
     observation TEXT NOT NULL,
-    FOREIGN KEY (entity_id) REFERENCES entities(id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (entity_id) REFERENCES entities(id),
+    FOREIGN KEY (relation_id) REFERENCES relations(id)
 );
 
+-- ===========================
+-- Relations Table
+-- ===========================
 CREATE TABLE IF NOT EXISTS relations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     from_entity_id INTEGER NOT NULL,
     to_entity_id INTEGER NOT NULL, 
-    relation_type TEXT NOT NULL,
+    relation_type INTEGER NOT NULL, -- References relation_types(id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (from_entity_id) REFERENCES entities(id),
-    FOREIGN KEY (to_entity_id) REFERENCES entities(id)
+    FOREIGN KEY (to_entity_id) REFERENCES entities(id),
+    FOREIGN KEY (relation_type) REFERENCES relation_types(id)
 );
 
--- Begin transaction for better performance
-BEGIN TRANSACTION;
-
--- Insert all entities
-INSERT INTO entities (name, entity_type) VALUES 
-('Hikvision', 'Plugin'),
-('VideoCamera', 'Interface'),
-('Intercom', 'Interface'),
-('ObjectDetector', 'Interface'),
-('RTSP', 'Protocol'),
-('HikvisionCamera', 'Class'),
-('RtspProvider', 'Class'),
-('MotionSensor', 'Interface');
-
--- Insert sample observations
-INSERT INTO observations (entity_id, observation) VALUES
-((SELECT id FROM entities WHERE name = 'Hikvision'), 'Supports cameras and NVRs'),
-((SELECT id FROM entities WHERE name = 'Hikvision'), 'Implements VideoCamera interfaces'),
-((SELECT id FROM entities WHERE name = 'VideoCamera'), 'Core interface for video streaming capabilities');
-
--- Insert sample relations
-INSERT INTO relations (from_entity_id, to_entity_id, relation_type) VALUES
-((SELECT id FROM entities WHERE name = 'Hikvision'), 
- (SELECT id FROM entities WHERE name = 'VideoCamera'),
- 'implements');
-
--- Commit transaction
-COMMIT;
-
--- Create indexes for better query performance
+-- ===========================
+-- Indexes for Base Schema
+-- ===========================
 CREATE INDEX IF NOT EXISTS idx_entities_name ON entities(name);
 CREATE INDEX IF NOT EXISTS idx_observations_entity_id ON observations(entity_id);
+CREATE INDEX IF NOT EXISTS idx_observations_relation_id ON observations(relation_id);
 CREATE INDEX IF NOT EXISTS idx_relations_from_to ON relations(from_entity_id, to_entity_id);
