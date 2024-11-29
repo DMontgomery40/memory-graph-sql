@@ -1,143 +1,68 @@
 # Semantic MCP Layer
 
-An intelligent semantic layer that enhances the MCP memory server with advanced semantic capabilities.
+A working implementation of a semantic layer that enhances the MCP memory server with real pattern matching and type inference capabilities.
 
 ## Features
 
-### Type Inference
-- Automatically infers entity types based on attributes and relationships
-- Learns patterns from existing entities
-- Maintains confidence scores and explanations for inferences
+- SQLite-based pattern storage
+- Real-time type inference with confidence scoring
+- Pattern matching with attribute validation
+- API endpoints for inference and pattern management
 
-### Relationship Intelligence
-- Suggests potential relationships between entities
-- Identifies common relationship patterns
-- Provides confidence scores for suggestions
+## Installation
 
-### Semantic Pattern Learning
-- Automatically learns patterns from entity interactions
-- Improves accuracy over time through feedback
-- Maintains a pattern database with success rates
-
-### Attribute Derivation
-- Derives additional attributes based on patterns
-- Enhances entities with computed properties
-- Maintains provenance of derived information
-
-## Quick Start
-
-1. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Initialize the database:
+## Usage
+
+1. Start the server:
 ```bash
-alembic upgrade head
+python src/api.py
 ```
 
-3. Start the server:
+2. Test the functionality:
 ```bash
-python start.py
+python tests/test_semantic.py
 ```
 
-## API Usage
+## API Endpoints
 
-### Enrich an Entity
-```python
-# Enrich an entity with semantic information
-response = await client.post("/semantic/enrich", json={
-    "id": "doc1",
-    "type": "Document",
-    "attributes": {
-        "title": "Project Plan",
-        "format": "pdf",
-        "size": 1024
-    }
-})
-```
-
-### Learn Patterns
-```python
-# Learn patterns from a set of entities
-response = await client.post("/semantic/learn", json={
-    "entities": [
-        {
-            "id": "doc1",
-            "type": "Document",
-            "attributes": {...}
-        },
-        ...
-    ]
-})
-```
-
-### Get Semantic Patterns
-```python
-# Get learned patterns of a specific type
-response = await client.get("/semantic/patterns/type_inference")
-```
-
-## Integration with MCP
-
-This semantic layer seamlessly integrates with the MCP memory server:
-
-1. Add to your MCP configuration:
+### Infer Types
+POST `/infer`
 ```json
 {
-    "mcpServers": {
-        "memory": {
-            "command": "npx",
-            "args": ["-y", "@modelcontextprotocol/server-memory"]
-        },
-        "semantic": {
-            "command": "python",
-            "args": ["start.py"]
-        }
+    "id": "doc1",
+    "attributes": {
+        "title": "Project Document",
+        "format": "pdf"
     }
 }
 ```
 
-2. The semantic layer will automatically enrich entities from the memory server
+### Get Patterns
+GET `/patterns`
 
 ## How It Works
 
-### Pattern Learning
-The system learns patterns by analyzing:
-- Attribute correlations
-- Relationship structures
-- Type hierarchies
-- Common usage patterns
+1. Pattern Matching:
+   - Validates required attributes
+   - Checks string patterns and values
+   - Applies keyword matching
 
-### Type Inference
-Types are inferred using:
-- Attribute patterns
-- Relationship context
-- Similar entity analysis
-- Historical data
+2. Confidence Scoring:
+   - Weights required vs optional attributes
+   - Adjusts for pattern specificity
+   - Considers attribute match quality
 
-### Relationship Suggestions
-Suggestions are based on:
-- Pattern matching
-- Graph analysis
-- Semantic similarity
-- Usage history
+3. Storage:
+   - Patterns stored in SQLite
+   - Inference results cached
+   - Pattern confidence tracked
 
 ## Development
 
-### Running Tests
-```bash
-python -m pytest tests/
-```
-
-### Adding New Features
-1. Create new pattern types in `semantic/patterns/`
-2. Add corresponding inference logic in `semantic/engine.py`
-3. Update API endpoints in `api/routes/semantic.py`
-4. Add tests in `tests/`
-
-## License
-MIT License - see LICENSE file
-
-## Contributing
-Contributions welcome! Please read CONTRIBUTING.md
+- Add new patterns in `semantic_core.py`
+- Extend pattern matching in `_match_value`
+- Add new API endpoints in `api.py`
