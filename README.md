@@ -1,110 +1,71 @@
-# Memory Graph SQL with MCP Support
+# Memory Graph MCP Tool
 
-This repository combines the original Memory Graph SQL implementation with Model Context Protocol (MCP) support for Claude Desktop integration.
-
-## Features
-
-- SQLite-based pattern storage
-- Real-time type inference with confidence scoring
-- Pattern matching with attribute validation
-- MCP integration for Claude Desktop
-- API endpoints for standalone usage
+A semantic pattern matching and type inference tool that implements the Model Context Protocol (MCP).
 
 ## Installation
 
+1. Install the package:
 ```bash
 pip install -r requirements.txt
 ```
 
-## Usage
-
-### As a Standalone API
-
-1. Start the server:
+2. Start the MCP server:
 ```bash
-python src/api.py
+python mcp_server.py
 ```
 
-2. Test the functionality:
-```bash
-python tests/test_semantic.py
-```
+The server will start and register itself with Claude Desktop.
 
-### With Claude Desktop (MCP)
+## Usage in Claude
 
-1. Register the MCP tool:
-```python
-from src.mcp_adapter import MemoryGraphMCP
-from mcp_core import register_tool
+Once the server is running, you can use the tool in Claude Desktop with these commands:
 
-# Initialize the tool
-memory_graph = MemoryGraphMCP()
-
-# Register with Claude Desktop
-register_tool('memory_graph', memory_graph)
-```
-
-2. Use in Claude Desktop with commands:
-
-```python
-# Infer types
-response = await memory_graph.handle_request({
-    'command': 'infer',
-    'parameters': {
-        'id': 'doc1',
-        'attributes': {
-            'title': 'Project Document',
-            'format': 'pdf'
+1. Infer type for a document:
+```json
+{
+    "command": "infer_type",
+    "parameters": {
+        "id": "doc1",
+        "attributes": {
+            "title": "Project Report",
+            "format": "pdf"
         }
     }
-})
+}
+```
 
-# Add pattern
-response = await memory_graph.handle_request({
-    'command': 'add_pattern',
-    'parameters': {
-        'id': 'pdf_doc',
-        'type': 'Document',
-        'pattern_data': {
-            'attribute_patterns': {
-                'title': {'type': 'string', 'required': True},
-                'format': {'type': 'string', 'values': ['pdf']}
+2. Add a new pattern:
+```json
+{
+    "command": "add_pattern",
+    "parameters": {
+        "id": "pdf_doc",
+        "type": "Document",
+        "pattern_data": {
+            "attribute_patterns": {
+                "title": {"type": "string", "required": true},
+                "format": {"type": "string", "values": ["pdf"]}
             }
         },
-        'confidence': 0.8
+        "confidence": 0.8
     }
-})
-
-# Get patterns
-response = await memory_graph.handle_request({
-    'command': 'get_patterns',
-    'parameters': {}
-})
+}
 ```
 
-## Testing
-
-Run all tests:
-```bash
-python -m unittest discover tests
+3. Get all patterns:
+```json
+{
+    "command": "get_patterns",
+    "parameters": {}
+}
 ```
 
-## API Documentation
+## Tool Commands
 
-### REST API Endpoints
-
-1. `/infer` (POST)
-2. `/patterns` (GET)
-
-### MCP Commands
-
-1. `infer` - Infer types for a document
-2. `add_pattern` - Add a new pattern
-3. `get_patterns` - List all patterns
+1. `infer_type`: Analyzes a document and returns matching patterns with confidence scores
+2. `add_pattern`: Adds a new pattern for matching
+3. `get_patterns`: Lists all available patterns
 
 ## Development
 
-- Add new patterns in `semantic_core.py`
-- Extend pattern matching in `_match_value`
-- Add new API endpoints in `api.py`
-- Modify MCP integration in `mcp_adapter.py`
+This tool uses the Model Context Protocol to integrate with Claude Desktop. See the [MCP documentation](https://github.com/modelcontextprotocol/docs) for more details.
