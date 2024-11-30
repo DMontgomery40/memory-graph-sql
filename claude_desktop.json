@@ -1,0 +1,64 @@
+{
+  "tools": [
+    {
+      "name": "memory_graph",
+      "description": "A semantic pattern matching and type inference tool",
+      "path": "mcp_tool.py",
+      "functions": [
+        {
+          "name": "infer_type",
+          "description": "Infer types for a given document based on patterns",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Document identifier"
+              },
+              "attributes": {
+                "type": "object",
+                "description": "Document attributes to match against patterns"
+              }
+            },
+            "required": ["id", "attributes"]
+          }
+        },
+        {
+          "name": "add_pattern",
+          "description": "Add a new pattern for matching",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Pattern identifier"
+              },
+              "type": {
+                "type": "string",
+                "description": "Pattern type"
+              },
+              "pattern_data": {
+                "type": "object",
+                "description": "Pattern matching rules"
+              },
+              "confidence": {
+                "type": "number",
+                "description": "Confidence threshold",
+                "default": 0.7
+              }
+            },
+            "required": ["id", "type", "pattern_data"]
+          }
+        },
+        {
+          "name": "get_patterns",
+          "description": "Get all available patterns",
+          "parameters": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,71 +1,52 @@
-# Memory Graph MCP Tool
+# Memory Graph - Claude Desktop Tool
 
-A semantic pattern matching and type inference tool that implements the Model Context Protocol (MCP).
+A semantic pattern matching and type inference tool for Claude Desktop.
 
 ## Installation
 
-1. Install the package:
-```bash
-pip install -r requirements.txt
-```
-
-2. Start the MCP server:
-```bash
-python mcp_server.py
-```
-
-The server will start and register itself with Claude Desktop.
+1. Copy `mcp_tool.py` and `claude_desktop.json` to your Claude Desktop tools directory
+2. Add the tool configuration to your Claude Desktop tools registry
 
 ## Usage in Claude
 
-Once the server is running, you can use the tool in Claude Desktop with these commands:
-
-1. Infer type for a document:
-```json
-{
-    "command": "infer_type",
-    "parameters": {
-        "id": "doc1",
-        "attributes": {
-            "title": "Project Report",
-            "format": "pdf"
-        }
-    }
-}
-```
-
-2. Add a new pattern:
-```json
-{
-    "command": "add_pattern",
-    "parameters": {
-        "id": "pdf_doc",
-        "type": "Document",
-        "pattern_data": {
-            "attribute_patterns": {
-                "title": {"type": "string", "required": true},
-                "format": {"type": "string", "values": ["pdf"]}
+```python
+# Add a pattern
+result = await memory_graph.add_pattern(
+    id="pdf_report",
+    type="Report",
+    pattern_data={
+        "attribute_patterns": {
+            "title": {
+                "type": "string",
+                "required": True,
+                "keywords": ["report", "analysis"]
+            },
+            "format": {
+                "type": "string",
+                "values": ["pdf"]
             }
-        },
-        "confidence": 0.8
+        }
+    },
+    confidence=0.8
+)
+
+# Infer document type
+result = await memory_graph.infer_type(
+    id="doc1",
+    attributes={
+        "title": "Q4 Financial Analysis Report",
+        "format": "pdf"
     }
-}
+)
+
+# Get all patterns
+patterns = await memory_graph.get_patterns()
 ```
 
-3. Get all patterns:
-```json
-{
-    "command": "get_patterns",
-    "parameters": {}
-}
-```
+## Features
 
-## Tool Commands
-
-1. `infer_type`: Analyzes a document and returns matching patterns with confidence scores
-2. `add_pattern`: Adds a new pattern for matching
-3. `get_patterns`: Lists all available patterns
-
-## Development
-
-This tool uses the Model Context Protocol to integrate with Claude Desktop. See the [MCP documentation](https://github.com/modelcontextprotocol/docs) for more details.
+- Pattern-based document type inference
+- Configurable confidence scoring
+- SQLite-based pattern storage
+- Keyword and value matching
+- Regular expression support
