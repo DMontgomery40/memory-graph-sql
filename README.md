@@ -1,13 +1,14 @@
-# Semantic MCP Layer
+# Memory Graph SQL with MCP Support
 
-A working implementation of a semantic layer that enhances the MCP memory server with real pattern matching and type inference capabilities.
+This repository combines the original Memory Graph SQL implementation with Model Context Protocol (MCP) support for Claude Desktop integration.
 
 ## Features
 
 - SQLite-based pattern storage
 - Real-time type inference with confidence scoring
 - Pattern matching with attribute validation
-- API endpoints for inference and pattern management
+- MCP integration for Claude Desktop
+- API endpoints for standalone usage
 
 ## Installation
 
@@ -16,6 +17,8 @@ pip install -r requirements.txt
 ```
 
 ## Usage
+
+### As a Standalone API
 
 1. Start the server:
 ```bash
@@ -27,42 +30,81 @@ python src/api.py
 python tests/test_semantic.py
 ```
 
-## API Endpoints
+### With Claude Desktop (MCP)
 
-### Infer Types
-POST `/infer`
-```json
-{
-    "id": "doc1",
-    "attributes": {
-        "title": "Project Document",
-        "format": "pdf"
-    }
-}
+1. Register the MCP tool:
+```python
+from src.mcp_adapter import MemoryGraphMCP
+from mcp_core import register_tool
+
+# Initialize the tool
+memory_graph = MemoryGraphMCP()
+
+# Register with Claude Desktop
+register_tool('memory_graph', memory_graph)
 ```
 
-### Get Patterns
-GET `/patterns`
+2. Use in Claude Desktop with commands:
 
-## How It Works
+```python
+# Infer types
+response = await memory_graph.handle_request({
+    'command': 'infer',
+    'parameters': {
+        'id': 'doc1',
+        'attributes': {
+            'title': 'Project Document',
+            'format': 'pdf'
+        }
+    }
+})
 
-1. Pattern Matching:
-   - Validates required attributes
-   - Checks string patterns and values
-   - Applies keyword matching
+# Add pattern
+response = await memory_graph.handle_request({
+    'command': 'add_pattern',
+    'parameters': {
+        'id': 'pdf_doc',
+        'type': 'Document',
+        'pattern_data': {
+            'attribute_patterns': {
+                'title': {'type': 'string', 'required': True},
+                'format': {'type': 'string', 'values': ['pdf']}
+            }
+        },
+        'confidence': 0.8
+    }
+})
 
-2. Confidence Scoring:
-   - Weights required vs optional attributes
-   - Adjusts for pattern specificity
-   - Considers attribute match quality
+# Get patterns
+response = await memory_graph.handle_request({
+    'command': 'get_patterns',
+    'parameters': {}
+})
+```
 
-3. Storage:
-   - Patterns stored in SQLite
-   - Inference results cached
-   - Pattern confidence tracked
+## Testing
+
+Run all tests:
+```bash
+python -m unittest discover tests
+```
+
+## API Documentation
+
+### REST API Endpoints
+
+1. `/infer` (POST)
+2. `/patterns` (GET)
+
+### MCP Commands
+
+1. `infer` - Infer types for a document
+2. `add_pattern` - Add a new pattern
+3. `get_patterns` - List all patterns
 
 ## Development
 
 - Add new patterns in `semantic_core.py`
 - Extend pattern matching in `_match_value`
 - Add new API endpoints in `api.py`
+- Modify MCP integration in `mcp_adapter.py`
